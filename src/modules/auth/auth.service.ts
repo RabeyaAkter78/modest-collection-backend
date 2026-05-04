@@ -1,6 +1,8 @@
 /* eslint-disable prettier/prettier */
 
 import config from '../../config'
+import { envVers } from '../../config/env'
+import { sendEmail } from '../../utils/sendEmail'
 import { IUser } from '../user/user.interface'
 import User from '../user/user.model'
 import { ILoginUser } from './auth.interface'
@@ -52,7 +54,34 @@ const login = async (payload: ILoginUser) => {
   }
 }
 
+const forgetPassword = async (email: string) => {
+  const isUserExists = await User.findOne({ email })
+  if (!isUserExists) {
+    throw new Error('User not found')
+  }
+  const jwtPayload = {
+    userId: isUserExists._id,
+    email: isUserExists.email,
+    role: isUserExists.role,
+  }
+
+  const resetToken = jwt.sign(jwtPayload, config.jwt_secret!, {
+    expiresIn: '10m',
+  })
+  const resetUILink = `${envVers.FRONTEND_URL}/reset-password?id=${isUserExists._id}&token=${resetToken}`
+
+  sendEmail({
+    to: isUserExists.email,
+    subject: 'Reset Password',
+    templateName: `<p>Click <a href="${resetUILink}">here</a> to reset your password</p>`,
+    templateData: {
+      name: isUserExists.name,
+      resetUILink,
+    },
+  })
+}
 export const AuthService = {
   register,
   login,
+  forgetPassword,
 }

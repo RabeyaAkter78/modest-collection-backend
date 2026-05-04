@@ -25,7 +25,19 @@ const login = catchAsync(async (req: Request, res: Response) => {
     data: result.verifiedUser,
   })
 })
+const forgetPassword = catchAsync(async (req: Request, res: Response) => {
+ const {email}=req.body
+  await AuthService.forgetPassword(email)
+  sendResponse(res, {
+    status: true,
+    StatusCode: StatusCodes.CREATED,
+    message: 'Email sent successfully',
+    
+      data:null,
+  })
+})
 export const AuthController = {
   register,
   login,
+  forgetPassword,
 }
