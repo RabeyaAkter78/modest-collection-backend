@@ -73,7 +73,7 @@ const forgetPassword = async (email: string) => {
   sendEmail({
     to: isUserExists.email,
     subject: 'Reset Password',
-    templateName: `<p>Click <a href="${resetUILink}">here</a> to reset your password</p>`,
+    templateName:"forgetPassword",
     templateData: {
       name: isUserExists.name,
       resetUILink,

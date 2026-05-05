@@ -15,7 +15,7 @@ authRoute.post(
 
 authRoute.post('/login',validateRequest(AuthValidation.loginValidationSchema),AuthController.login)
 // forget password and reset password routes can be added here in the future:
-authRoute.post('/forget-password',AuthController.forgetPassword)
+authRoute.post('/forgot-password',AuthController.forgetPassword)
 
 
 export default authRoute

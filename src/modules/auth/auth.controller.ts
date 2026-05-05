@@ -32,7 +32,6 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
     status: true,
     StatusCode: StatusCodes.CREATED,
     message: 'Email sent successfully',
-    
       data:null,
   })
 })
