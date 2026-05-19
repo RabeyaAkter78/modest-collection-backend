@@ -80,6 +80,8 @@ const forgetPassword = async (email: string) => {
     },
   })
 }
+
+
 export const AuthService = {
   register,
   login,
