@@ -4,6 +4,7 @@ import catchAsync from '../../utils/catchAsync'
 import sendResponse from '../../utils/sendResponse'
 import { StatusCodes } from 'http-status-codes'
 import { AuthService } from './auth.service'
+import { IResetPassword } from './auth.interface'
 
 const register = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthService.register(req.body)
@@ -26,17 +27,23 @@ const login = catchAsync(async (req: Request, res: Response) => {
   })
 })
 const forgetPassword = catchAsync(async (req: Request, res: Response) => {
- const {email}=req.body
+  const { email } = req.body
   await AuthService.forgetPassword(email)
   sendResponse(res, {
     status: true,
     StatusCode: StatusCodes.CREATED,
     message: 'Email sent successfully',
-      data:null,
+    data: null,
   })
 })
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const result = await AuthService.resetPassword(req.body)
+  const payload: IResetPassword = {
+    token: req.query.token as string,  
+    id: req.query.id as string,       
+    password: req.body.password,
+  }
+
+  const result = await AuthService.resetPassword(payload)
   sendResponse(res, {
     status: true,
     StatusCode: StatusCodes.OK,

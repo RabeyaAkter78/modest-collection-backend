@@ -16,9 +16,14 @@ const forgetPasswordSchema = z.object({
 })
 
 const resetPasswordSchema = z.object({
-  id: z.string().nonempty('id is required'),
-  token: z.string().nonempty('Token is required'),
-  password: z.string().nonempty('Password is required'),
+  query: z.object({
+    id: z.string().nonempty('id is required'),
+    token: z.string().nonempty('Token is required'),
+  }),
+  body: z.object({
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string().min(6, 'Confirm password is required'),
+  }),
 })
 
 const changePasswordSchema = z.object({
