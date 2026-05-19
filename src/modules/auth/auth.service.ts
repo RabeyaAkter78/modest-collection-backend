@@ -5,7 +5,7 @@ import { envVers } from '../../config/env'
 import { sendEmail } from '../../utils/sendEmail'
 import { IUser } from '../user/user.interface'
 import User from '../user/user.model'
-import { ILoginUser } from './auth.interface'
+import { ILoginUser, IResetPassword, IChangePassword } from './auth.interface'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -81,9 +81,75 @@ const forgetPassword = async (email: string) => {
   })
 }
 
+const resetPassword = async (payload: IResetPassword) => {
+  let decoded;
+  try {
+    decoded = jwt.verify(payload.token, config.jwt_secret!) as jwt.JwtPayload;
+  } catch (error) {
+    throw new Error('Invalid or expired token');
+  }
+
+  const { userId } = decoded;
+  if (userId !== payload.id) {
+    throw new Error('Unauthorized request!');
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+  if (user.userStatus === 'inactive') {
+    throw new Error('User is inactive. Please contact admin.');
+  }
+
+  const hashedPassword = await bcrypt.hash(
+    payload.password,
+    Number(config.bcrypt_salt_rounds)
+  );
+
+  const result = await User.findByIdAndUpdate(
+    userId,
+    { password: hashedPassword },
+    { new: true }
+  );
+
+  return result;
+};
+
+const changePassword = async (userEmail: string, payload: IChangePassword) => {
+  const user = await User.findOne({ email: userEmail });
+  if (!user) {
+    throw new Error('User not found');
+  }
+  if (user.userStatus === 'inactive') {
+    throw new Error('User is inactive. Please contact admin.');
+  }
+  const isPasswordMatched = await bcrypt.compare(
+    payload.oldPassword,
+    user.password
+  );
+  if (!isPasswordMatched) {
+    throw new Error('Old password is incorrect');
+  }
+  
+  const hashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+
+  const result = await User.findByIdAndUpdate(
+    user._id,
+    { password: hashedPassword },
+    { new: true }
+  );
+
+  return result;
+};
 
 export const AuthService = {
   register,
   login,
   forgetPassword,
-}
+  resetPassword,
+  changePassword,
+};
