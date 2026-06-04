@@ -6,7 +6,7 @@ jobs:
   test-code:
     runs-on: windows-latest
     steps:
-      - name: Run the Test
+      - name: Print working directory
         run: |
           pwd
           ls -a
