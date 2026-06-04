@@ -1,0 +1,14 @@
+name: Ready for deployment
+
+on: [push,workflow_dispatch]
+
+jobs: 
+  test-code:
+    runs-on: windows-latest
+    steps:
+      - name: Run the Test
+        run: |
+          pwd
+          ls -a
+          echo $GITHUB_WORKSPACE
+
