@@ -7,8 +7,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Print working directory
-        run: |
-          pwd
-          ls -a
-          echo $GITHUB_WORKSPACE
+        uses: |
+            node -v
+            git --version
 
